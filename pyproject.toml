@@ -4,9 +4,12 @@ version = "0.1.0"
 description = ""
 authors = ["estebandurangov <esteban.durangov@udea.edu.co>"]
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.10"
+fastapi = {extras = ["standard"], version = "^0.115.8"}
+pandas = "^2.2.3"
 
 
 [build-system]
