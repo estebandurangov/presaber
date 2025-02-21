@@ -10,6 +10,7 @@ package-mode = false
 python = "^3.10"
 fastapi = {extras = ["standard"], version = "^0.115.8"}
 pandas = "^2.2.3"
+pydantic = "^2.10.6"
 
 
 [build-system]
