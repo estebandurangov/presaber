@@ -1,8 +1,10 @@
 from pydantic import BaseModel
 
 class Resultado(BaseModel):
+    Nombre: str
+    Grupo: str
     codigo: int
-    ciencias_naturales: int
+    ciencias_naturales: int 
     matematicas: int
     ciencias_sociales: int
     ingles: int

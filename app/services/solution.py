@@ -5,7 +5,7 @@ def get_solution():
 
 def get_student_a():
     df = pd.read_csv("templates/student1.csv", encoding="utf-8")
-    return df.iloc[1:, [1]+ list(range(7, df.shape[1]))[0:-4]]
+    return df.iloc[1:, [1]+ list(range(7, df.shape[1]))]
 
 def get_student_b():
     df = pd.read_csv("templates/student2.csv", encoding="utf-8")
@@ -66,7 +66,11 @@ def get_all():
     
     res.columns = ['codigo', 'ciencias_naturales', 'matematicas', 'ciencias_sociales', 'ingles', 'comprension_lectora', 'total']
     res = res.astype(int)
-
-    return res.to_dict(orient='records')
+    codes_with_name = pd.read_csv("templates/codes.csv", encoding="utf-8")
+    codes_with_name = codes_with_name.drop(columns=['Firma'])
+    final_df = pd.merge(codes_with_name, res, on="codigo", how="outer")
+    final_df = final_df.fillna(0)
+    final_df.to_csv("templates/final_results.csv", index=False, encoding="utf-8")
+    return final_df.to_dict(orient='records')
     
 get_all()
