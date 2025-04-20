@@ -38,6 +38,73 @@ def resultado_estudiantes(respuestas_estudiantes, respuestas_correctas, area):
         resultados.append(resultado)
     return resultados
 
+def promedios_grupo (resultados_estudiantes):
+    df = pd.DataFrame(resultados_estudiantes)
+
+    stats_por_grupo = df.groupby("Grupo")[[
+        "ciencias_naturales",
+        "matematicas",
+        "ciencias_sociales",
+        "ingles",
+        "comprension_lectora",
+        "total"
+    ]].agg(['mean', 'std', 'min', 'max']).reset_index()
+
+    stats_por_grupo.iloc[:, 1:] = stats_por_grupo.iloc[:, 1:].round(0).astype(int)
+
+
+    stats_por_grupo.columns = [
+        f"{col[0]}_{col[1]}" if col[1] else col[0]
+        for col in stats_por_grupo.columns.values
+    ]
+
+    return stats_por_grupo.to_dict(orient='records')
+
+def info_by_area(resultados_estudiantes, area: str, lvl_1, lvl_2, lvl_3):
+    df = pd.DataFrame(resultados_estudiantes)
+    resumen_area = df[area].agg(['mean', 'std', 'min', 'max']).reset_index()
+    niveles = {
+        'lvl_1': ((df[area] <= lvl_1)).sum(),
+        'lvl_2': ((df[area] > lvl_1) & (df[area] <= lvl_2)).sum(),
+        'lvl_3': ((df[area] > lvl_2) & (df[area] <= lvl_3)).sum(),
+        'lvl_4': (df[area] > lvl_3).sum()
+    }
+    niveles_df = pd.DataFrame.from_dict(niveles, orient='index', columns=[area]).reset_index()
+    
+
+    resumen_area = pd.concat([
+        resumen_area,
+        niveles_df
+    ])
+    
+
+    return resumen_area
+
+
+def promedio_general(resultados_estudiantes):
+    lectura_critica = info_by_area(resultados_estudiantes, 'comprension_lectora', 35, 50, 65)
+    matematicas = info_by_area(resultados_estudiantes, 'matematicas', 35, 50, 70)
+    ciencias_naturales = info_by_area(resultados_estudiantes, 'ciencias_naturales', 40, 55, 70)
+    ingles = info_by_area(resultados_estudiantes, 'ingles', 36, 57, 70)
+    ciencias_sociales = info_by_area(resultados_estudiantes, 'ciencias_sociales', 40, 55, 70)
+    total = info_by_area(resultados_estudiantes, 'total', 235, 315, 415)
+
+    resumen_general = pd.concat([
+        lectura_critica,
+        matematicas,
+        ciencias_naturales,
+        ingles,
+        ciencias_sociales,
+        total
+    ], axis=1)
+    resumen_general = resumen_general.loc[:, ~resumen_general.columns.duplicated()]
+
+    df_melted = resumen_general.melt(id_vars='index', var_name='area', value_name='valor')
+    df_pivot = df_melted.pivot(index='area', columns='index', values='valor').reset_index()
+    numeric_columns = df_pivot.select_dtypes(include=['number']).columns
+    df_pivot[numeric_columns] = df_pivot[numeric_columns].round(1)
+    
+    return df_pivot.to_dict(orient='records')
 
 def get_all():
     A = get_student_a()
@@ -45,6 +112,7 @@ def get_all():
 
     """
     merged contiene todas las respuestas de los estudiantes con ID Number
+    es decir, el ID Number de cada estudiante con las respuestas
     """
     merged = pd.merge(A, B, on="ID Number", how="outer", suffixes=('_A', '_B'))
     solucionario = get_solution()
@@ -67,10 +135,14 @@ def get_all():
     res.columns = ['codigo', 'ciencias_naturales', 'matematicas', 'ciencias_sociales', 'ingles', 'comprension_lectora', 'total']
     res = res.astype(int)
     codes_with_name = pd.read_csv("templates/codes.csv", encoding="utf-8")
+    codes_with_name['Grupo'] = codes_with_name['Grupo'].str.replace('Grupo ', '', regex=False)
+
     codes_with_name = codes_with_name.drop(columns=['Firma'])
     final_df = pd.merge(codes_with_name, res, on="codigo", how="outer")
     final_df = final_df.fillna(0)
     final_df.to_csv("templates/final_results.csv", index=False, encoding="utf-8")
     return final_df.to_dict(orient='records')
     
-get_all()
+
+estudiantes = get_all()
+promedio_general(estudiantes)
