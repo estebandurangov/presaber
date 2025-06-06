@@ -10,3 +10,5 @@ class Resultado(BaseModel):
     ingles: int
     comprension_lectora: int
     total: int
+    percentil: int
+    puesto: int

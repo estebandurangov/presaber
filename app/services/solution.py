@@ -1,4 +1,5 @@
 import pandas as pd
+from scipy.stats import percentileofscore
 
 def get_solution():
     return pd.read_csv("templates/solver.csv", encoding="utf-8").iloc[:, :4]
@@ -37,6 +38,34 @@ def resultado_estudiantes(respuestas_estudiantes, respuestas_correctas, area):
         resultado = resultado_estudiante(respuestas_estudiantes.iloc[i], respuestas_correctas, area)
         resultados.append(resultado)
     return resultados
+
+def calcular_percentiles(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Añade una columna 'percentil' al DataFrame que indica el
+    porcentaje de estudiantes con un puntaje total inferior.
+    """
+    df = df.copy()
+    df["percentil"] = df["total"].apply(lambda x: int(round(percentileofscore(df["total"], x, kind="rank"))))
+    return df
+
+def calcular_puestos(df: pd.DataFrame) -> pd.DataFrame:
+    # Ordenamos por los criterios especificados
+    df_ordenado = df.sort_values(
+        by=["total", "matematicas", "comprension_lectora", "ciencias_naturales", "ciencias_sociales", "ingles"],
+        ascending=[False] * 6
+    ).reset_index(drop=True)
+
+    # Asignamos los puestos
+    df_ordenado["puesto"] = range(1, len(df_ordenado) + 1)
+
+    # Usamos el código como identificador para hacer merge y restaurar el orden original
+    df_con_puesto = df.merge(
+        df_ordenado[["codigo", "puesto"]],
+        on="codigo",
+        how="left"
+    )
+
+    return df_con_puesto
 
 def promedios_grupo (resultados_estudiantes):
     df = pd.DataFrame(resultados_estudiantes)
@@ -130,16 +159,28 @@ def get_all():
 
     for area_name in ['Ciencias Naturales', 'Matemáticas', 'Ciencias sociales', 'Inglés', 'Comprención lectora']:
         res[area_name] = res[area_name] * count_questions[area_name]
-    res['total'] = res[['Ciencias Naturales', 'Matemáticas', 'Ciencias sociales', 'Inglés', 'Comprención lectora']].sum(axis=1)
     
+    res['total'] = (
+        res['Inglés'] * 1 +
+        res['Comprención lectora'] * 3 +
+        res['Matemáticas'] * 3 +
+        res['Ciencias sociales'] * 3 +
+        res['Ciencias Naturales'] * 3
+    ) / 13
+
+    res['total'] = (res['total'] * 5).round()
+    print (res)
     res.columns = ['codigo', 'ciencias_naturales', 'matematicas', 'ciencias_sociales', 'ingles', 'comprension_lectora', 'total']
     res = res.astype(int)
     codes_with_name = pd.read_csv("templates/codes.csv", encoding="utf-8")
-    codes_with_name['Grupo'] = codes_with_name['Grupo'].str.replace('Grupo ', '', regex=False)
+    codes_with_name['Grupo'] = codes_with_name['Grupo'].fillna(0).astype(int).astype(str)
 
-    codes_with_name = codes_with_name.drop(columns=['Firma'])
+    #codes_with_name = codes_with_name.drop(columns=['Firma'])
     final_df = pd.merge(codes_with_name, res, on="codigo", how="outer")
     final_df = final_df.fillna(0)
+    final_df = calcular_percentiles(final_df)
+    final_df = calcular_puestos(final_df)
+    # print(final_df)
     final_df.to_csv("templates/final_results.csv", index=False, encoding="utf-8")
     return final_df.to_dict(orient='records')
     
