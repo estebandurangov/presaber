@@ -7,8 +7,8 @@ class Resultado(BaseModel):
     ciencias_naturales: int 
     matematicas: int
     ciencias_sociales: int
-    ingles: int
-    comprension_lectora: int
+    #ingles: int
+    Lectura: int
     total: int
     percentil: int
     puesto: int

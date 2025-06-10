@@ -21,8 +21,7 @@ def resultado_estudiante(respuestas_estudiante, respuestas_correctas, area):
         'Ciencias Naturales': 0,
         'Matemáticas': 0,
         'Ciencias sociales': 0,
-        'Inglés': 0,
-        'Comprención lectora': 0,
+        'Lectura': 0,
     }
     for index, respuesta in enumerate(respuestas_estudiante[1:], start=0):
         if respuesta == respuestas_correctas[index]:
@@ -51,8 +50,8 @@ def calcular_percentiles(df: pd.DataFrame) -> pd.DataFrame:
 def calcular_puestos(df: pd.DataFrame) -> pd.DataFrame:
     # Ordenamos por los criterios especificados
     df_ordenado = df.sort_values(
-        by=["total", "matematicas", "comprension_lectora", "ciencias_naturales", "ciencias_sociales", "ingles"],
-        ascending=[False] * 6
+        by=["total", "matematicas", "Lectura", "ciencias_naturales", "ciencias_sociales"],
+        ascending=[False] * 5
     ).reset_index(drop=True)
 
     # Asignamos los puestos
@@ -74,8 +73,7 @@ def promedios_grupo (resultados_estudiantes):
         "ciencias_naturales",
         "matematicas",
         "ciencias_sociales",
-        "ingles",
-        "comprension_lectora",
+        "Lectura",
         "total"
     ]].agg(['mean', 'std', 'min', 'max']).reset_index()
 
@@ -111,10 +109,10 @@ def info_by_area(resultados_estudiantes, area: str, lvl_1, lvl_2, lvl_3):
 
 
 def promedio_general(resultados_estudiantes):
-    lectura_critica = info_by_area(resultados_estudiantes, 'comprension_lectora', 35, 50, 65)
+    lectura_critica = info_by_area(resultados_estudiantes, 'Lectura', 35, 50, 65)
     matematicas = info_by_area(resultados_estudiantes, 'matematicas', 35, 50, 70)
     ciencias_naturales = info_by_area(resultados_estudiantes, 'ciencias_naturales', 40, 55, 70)
-    ingles = info_by_area(resultados_estudiantes, 'ingles', 36, 57, 70)
+    #ingles = info_by_area(resultados_estudiantes, 'ingles', 36, 57, 70)
     ciencias_sociales = info_by_area(resultados_estudiantes, 'ciencias_sociales', 40, 55, 70)
     total = info_by_area(resultados_estudiantes, 'total', 235, 315, 415)
 
@@ -122,7 +120,7 @@ def promedio_general(resultados_estudiantes):
         lectura_critica,
         matematicas,
         ciencias_naturales,
-        ingles,
+        #ingles,
         ciencias_sociales,
         total
     ], axis=1)
@@ -137,40 +135,40 @@ def promedio_general(resultados_estudiantes):
 
 def get_all():
     A = get_student_a()
-    B = get_student_b()
+    #B = get_student_b()
 
     """
     merged contiene todas las respuestas de los estudiantes con ID Number
     es decir, el ID Number de cada estudiante con las respuestas
     """
-    merged = pd.merge(A, B, on="ID Number", how="outer", suffixes=('_A', '_B'))
+    #merged = pd.merge(A, B, on="ID Number", how="outer", suffixes=('_A', '_B'))
     solucionario = get_solution()
 
     respuestas_correctas = solucionario.iloc[:,2]
     area = solucionario.iloc[:,3]
 
     
-    resultados = resultado_estudiantes(merged, respuestas_correctas, area)
+    resultados = resultado_estudiantes(A, respuestas_correctas, area)
     res = pd.DataFrame(resultados)
     
     count_questions = area.value_counts()
 
     count_questions = 100 / count_questions
 
-    for area_name in ['Ciencias Naturales', 'Matemáticas', 'Ciencias sociales', 'Inglés', 'Comprención lectora']:
+    for area_name in ['Ciencias Naturales', 'Matemáticas', 'Ciencias sociales', 'Lectura']:
         res[area_name] = res[area_name] * count_questions[area_name]
     
     res['total'] = (
-        res['Inglés'] * 1 +
-        res['Comprención lectora'] * 3 +
+        #res['Inglés'] * 1 +
+        res['Lectura'] * 3 +
         res['Matemáticas'] * 3 +
         res['Ciencias sociales'] * 3 +
         res['Ciencias Naturales'] * 3
-    ) / 13
+    ) / 12
 
-    res['total'] = (res['total'] * 5).round()
+    res['total'] = (res['total'] * 4).round()
     print (res)
-    res.columns = ['codigo', 'ciencias_naturales', 'matematicas', 'ciencias_sociales', 'ingles', 'comprension_lectora', 'total']
+    res.columns = ['codigo', 'ciencias_naturales', 'matematicas', 'ciencias_sociales', 'Lectura', 'total']
     res = res.astype(int)
     codes_with_name = pd.read_csv("templates/codes.csv", encoding="utf-8")
     codes_with_name['Grupo'] = codes_with_name['Grupo'].fillna(0).astype(int).astype(str)
