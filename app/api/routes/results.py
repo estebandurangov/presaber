@@ -8,8 +8,12 @@ router = APIRouter()
 
 
 @router.get("/", response_model=list[Resultado], status_code=200)
-async def get_results():
-    return get_all()
+async def get_results(municipio: str = None):
+    if municipio:
+        df = get_all()
+        df_filtrado = df[df["Municipio"] == municipio]
+        return df_filtrado.to_dict(orient='records')
+    return get_all().to_dict(orient='records')
 
 @router.get("/institucion", response_model=None, status_code=200)
 async def get_results_institucion():

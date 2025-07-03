@@ -6,11 +6,11 @@ def get_solution():
 
 def get_student_a():
     df = pd.read_csv("templates/student1.csv", encoding="utf-8")
-    return df.iloc[1:, [1]+ list(range(7, df.shape[1]))]
+    return df.iloc[:, [1]+ list(range(8, df.shape[1]))]
 
 def get_student_b():
     df = pd.read_csv("templates/student2.csv", encoding="utf-8")
-    return df.iloc[1:, [1]+ list(range(7, df.shape[1]))]
+    return df.iloc[:, [1]+ list(range(8, df.shape[1]))]
 
 def resultado_estudiante(respuestas_estudiante, respuestas_correctas, area):
     """
@@ -22,7 +22,7 @@ def resultado_estudiante(respuestas_estudiante, respuestas_correctas, area):
         'Matemáticas': 0,
         'Ciencias sociales': 0,
         'Inglés': 0,
-        'Comprención lectora': 0,
+        'Comprension lectora': 0,
     }
     for index, respuesta in enumerate(respuestas_estudiante[1:], start=0):
         if respuesta == respuestas_correctas[index]:
@@ -35,6 +35,7 @@ def resultado_estudiantes(respuestas_estudiantes, respuestas_correctas, area):
     """
     resultados = []
     for i in range(respuestas_estudiantes.shape[0]):
+        
         resultado = resultado_estudiante(respuestas_estudiantes.iloc[i], respuestas_correctas, area)
         resultados.append(resultado)
     return resultados
@@ -46,6 +47,17 @@ def calcular_percentiles(df: pd.DataFrame) -> pd.DataFrame:
     """
     df = df.copy()
     df["percentil"] = df["total"].apply(lambda x: int(round(percentileofscore(df["total"], x, kind="rank"))))
+    return df
+
+def calcular_percentiles_por_municipio(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Añade una columna 'percentil_municipio' al DataFrame que indica el
+    porcentaje de estudiantes con un puntaje total inferior dentro de cada Municipio.
+    """
+    df = df.copy()
+    df["percentil"] = df.groupby("Municipio")["total"].transform(
+        lambda x: x.apply(lambda v: int(round(percentileofscore(x, v, kind="rank"))))
+    )
     return df
 
 def calcular_puestos(df: pd.DataFrame) -> pd.DataFrame:
@@ -66,6 +78,38 @@ def calcular_puestos(df: pd.DataFrame) -> pd.DataFrame:
     )
 
     return df_con_puesto
+
+def calcular_puestos_por_municipio(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Añade una columna 'puesto' al DataFrame que indica el puesto de cada estudiante
+    dentro de su municipio, ordenado jerárquicamente por total, matemáticas,
+    comprensión lectora, ciencias naturales, ciencias sociales e inglés.
+    """
+    df = df.copy()
+    
+    # Definir columnas de orden jerárquico
+    orden = [
+        "total",
+        "matematicas",
+        "comprension_lectora",
+        "ciencias_naturales",
+        "ciencias_sociales",
+        "ingles",
+    ]
+    
+    # Ordenar por municipio + criterios de desempate
+    df.sort_values(
+        by=["Municipio"] + orden,
+        ascending=[True] + [False] * len(orden),
+        inplace=True,
+    )
+    
+    # Asignar puesto: enumerar dentro de cada municipio
+    df["puesto"] = (
+        df.groupby("Municipio").cumcount() + 1
+    )
+    
+    return df
 
 def promedios_grupo (resultados_estudiantes):
     df = pd.DataFrame(resultados_estudiantes)
@@ -144,6 +188,7 @@ def get_all():
     es decir, el ID Number de cada estudiante con las respuestas
     """
     merged = pd.merge(A, B, on="ID Number", how="outer", suffixes=('_A', '_B'))
+    
     solucionario = get_solution()
 
     respuestas_correctas = solucionario.iloc[:,2]
@@ -151,39 +196,52 @@ def get_all():
 
     
     resultados = resultado_estudiantes(merged, respuestas_correctas, area)
+    
+    
     res = pd.DataFrame(resultados)
     
     count_questions = area.value_counts()
 
     count_questions = 100 / count_questions
 
-    for area_name in ['Ciencias Naturales', 'Matemáticas', 'Ciencias sociales', 'Inglés', 'Comprención lectora']:
+    for area_name in ['Ciencias Naturales', 'Matemáticas', 'Ciencias sociales', 'Inglés', 'Comprension lectora']:
         res[area_name] = res[area_name] * count_questions[area_name]
     
     res['total'] = (
         res['Inglés'] * 1 +
-        res['Comprención lectora'] * 3 +
+        res['Comprension lectora'] * 3 +
         res['Matemáticas'] * 3 +
         res['Ciencias sociales'] * 3 +
         res['Ciencias Naturales'] * 3
     ) / 13
 
     res['total'] = (res['total'] * 5).round()
-    print (res)
     res.columns = ['codigo', 'ciencias_naturales', 'matematicas', 'ciencias_sociales', 'ingles', 'comprension_lectora', 'total']
     res = res.astype(int)
+    
+    # Verificar si existen códigos repetidos en 'res'
+    
     codes_with_name = pd.read_csv("templates/codes.csv", encoding="utf-8")
-    codes_with_name['Grupo'] = codes_with_name['Grupo'].fillna(0).astype(int).astype(str)
+    #codes_with_name['Grupo'] = codes_with_name['Grupo'].fillna(0).astype(int).astype(str)
+    codes_with_name['Documento'] = codes_with_name['Documento'].fillna(0).astype(int).astype(str)
 
     #codes_with_name = codes_with_name.drop(columns=['Firma'])
-    final_df = pd.merge(codes_with_name, res, on="codigo", how="outer")
+    final_df = pd.merge(codes_with_name, res, on="codigo", how="right")
+    
     final_df = final_df.fillna(0)
-    final_df = calcular_percentiles(final_df)
-    final_df = calcular_puestos(final_df)
-    # print(final_df)
+    final_df = calcular_percentiles_por_municipio(final_df)
+    final_df = calcular_puestos_por_municipio(final_df)
+    
+    # Verificar si existen códigos repetidos en 'final_df'
+    duplicated_codes = final_df[final_df.duplicated(subset=['codigo'], keep=False)]
+    if not duplicated_codes.empty:
+        print("Códigos repetidos encontrados:")
+        for _, row in duplicated_codes.iterrows():
+            print(f"Código: {row['codigo']}, Municipio: {row.get('Municipio', 'N/A')}")
+    
     final_df.to_csv("templates/final_results.csv", index=False, encoding="utf-8")
-    return final_df.to_dict(orient='records')
+    return final_df
     
 
 estudiantes = get_all()
-promedio_general(estudiantes)
+#promedio_general(estudiantes)
