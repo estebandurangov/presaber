@@ -2,9 +2,8 @@ from pydantic import BaseModel
 
 class Resultado(BaseModel):
     Nombre: str
-    Documento: str
     Institucion: str
-    Municipio: str
+    Grupo: str
     codigo: int
     ciencias_naturales: int 
     matematicas: int
