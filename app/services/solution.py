@@ -21,27 +21,23 @@ def resultado_estudiante(respuestas_estudiante, respuestas_correctas, area, comp
         'Ciencias Naturales': 0,
         'Matemáticas': 0,
         'Ciencias sociales': 0,
-        'Inglés': 0,
-        'Comprension lectora': 0,
-        'Estadística': 0,
-        'Algebra y Cálculo': 0,
-        'Geometría': 0,
-        'Fisica': 0,
-        'Biologia': 0,
-        'Quimica': 0,
-        'Reflexionar a partir de un texto y evaluar su contenido': 0,
-        'Identificar y entender los contenidos locales que conforman un texto': 0,
-        'Comprender cómo se articulan las partes de un texto para darle un sentido global': 0,
-        'Pensamiento Social': 0,
-        'Pensamiento reflexivo y sistémico': 0,
-        'Interpretación y análisis de perspectivas': 0,
-        'Léxico': 0,
-        'Pragmático': 0,
-        'Comunicativo': 0,
-        'Gramatical': 0,
-        'Comprensión lectora': 0,
-        'Lectura inferencial': 0,
-        'Léxico-gramatical': 0,
+        'Lectura': 0,
+        'Aleatorio': 0,
+        'Numérico-variacional': 0,
+        'Espacial-métrico': 0,
+        'Entorno vivo': 0,
+        'CTS': 0,
+        'Entorno físico': 0,
+        'Multiperspectivismo': 0,
+        'Pensamiento sistémico': 0,
+        'Conocimiento': 0,
+        'Planteamiento y resolución de problemas': 0,
+        'Comunicación, modelación y representación': 0,
+        'Razonamiento y argumentación': 0,
+        'Comprende el sentido local y global del texto mediante inferencias de información implícita': 0,
+        'Asume una posición crítica sobre el texto mediante la evaluación de su forma y contenido.': 0,
+        'Recupera información literal expresada en fragmentos del texto.': 0,
+        'Argumentación en contextos ciudadanos': 0,
     }
     for index, respuesta in enumerate(respuestas_estudiante[1:], start=0):
         if respuesta == respuestas_correctas[index]:
@@ -86,10 +82,9 @@ def calcular_puestos(df: pd.DataFrame) -> pd.DataFrame:
     orden = [
         "total",
         "matematicas",
-        "comprension_lectora",
+        "lectura_critica",
         "ciencias_naturales",
         "ciencias_sociales",
-        "ingles",
     ]
     
     # Ordenar por Institucion + criterios de desempate
@@ -111,13 +106,12 @@ def calcular_puestos(df: pd.DataFrame) -> pd.DataFrame:
 
 def get_all():
     A = get_student_a()
-    B = get_student_b()
 
     """
     merged contiene todas las respuestas de los estudiantes con ID Number
     es decir, el ID Number de cada estudiante con las respuestas
     """
-    merged = pd.merge(A, B, on="ID Number", how="outer", suffixes=('_A', '_B'))
+    #merged = pd.merge(A, B, on="ID Number", how="outer", suffixes=('_A', '_B'))
     
     solucionario = get_solution()
 
@@ -127,10 +121,12 @@ def get_all():
     Competencia = solucionario.iloc[:,5]
 
     
-    resultados = resultado_estudiantes(merged, respuestas_correctas, area, componente, Competencia)
+    resultados = resultado_estudiantes(A, respuestas_correctas, area, componente, Competencia)
     
     
     res = pd.DataFrame(resultados)
+
+    print (res.head())
     
     count_questions = area.value_counts()
 
@@ -142,7 +138,7 @@ def get_all():
     competencias_value = Competencia.value_counts()
     competencias_value = 100 / competencias_value
 
-    for area_name in ['Ciencias Naturales', 'Matemáticas', 'Ciencias sociales', 'Inglés', 'Comprension lectora']:
+    for area_name in ['Ciencias Naturales', 'Matemáticas', 'Ciencias sociales', 'Lectura']:
         res[area_name] = res[area_name] * count_questions[area_name]
 
     for componente_name in componentes_value.index:
@@ -154,22 +150,21 @@ def get_all():
             res[competencia_name] = res[competencia_name] * competencias_value[competencia_name]
     
     res['total'] = (
-        res['Inglés'] * 1 +
-        res['Comprension lectora'] * 3 +
+        res['Lectura'] * 3 +
         res['Matemáticas'] * 3 +
         res['Ciencias sociales'] * 3 +
         res['Ciencias Naturales'] * 3
-    ) / 13
+    ) / 12
 
-    res['total'] = (res['total'] * 5).round()
+    res['total'] = (res['total'] * 4).round()
     res.columns = [
-        'codigo', 'ciencias_naturales', 'matematicas', 'ciencias_sociales', 'ingles', 'lectura_critica', 
-        'estadistica', 'algebra','geometria', 
-        'fisica', 'biologia', 'quimica ',
-        'evaluar_texto', 'entender_contenidos', 'articular_partes',
-        'pensamiento_social', 'pensamiento_reflexivo', 'interpretacion_perspectivas',
-        'lexico', 'pragmatico', 'comunicativo', 'gramatical',
-        'comprension_lectora', 'lectura_inferencial', 'lexico_gramatical',
+        'codigo', 'ciencias_naturales', 'matematicas', 'ciencias_sociales', 'lectura_critica', 
+        'aleatorio', 'numerico_variacional', 'espacial_metricos', 'entorno_vivo',
+        'cts', 'entorno_fisico', 'multiperspectivismo', 'pensamiento_sistemico',
+        'conocimiento', 'planteamiento_y_resolucion_de_problemas',
+        'comunicacion_modelacion_y_representacion', 'razonamiento_y_argumentacion',
+        'comprende_sentido_del_texto', 'asume_posicion_critica', 'recupera_informacion_literal',
+        'argumentacion_en_contextos_ciudadanos',
         'total',        
         ]
     res = res.astype(int)

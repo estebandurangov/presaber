@@ -27,15 +27,13 @@ def promedio_general(resultados_estudiantes):
     lectura_critica = info_by_area(resultados_estudiantes, 'lectura_critica', 35, 50, 65)
     matematicas = info_by_area(resultados_estudiantes, 'matematicas', 35, 50, 70)
     ciencias_naturales = info_by_area(resultados_estudiantes, 'ciencias_naturales', 40, 55, 70)
-    ingles = info_by_area(resultados_estudiantes, 'ingles', 36, 57, 70)
     ciencias_sociales = info_by_area(resultados_estudiantes, 'ciencias_sociales', 40, 55, 70)
-    total = info_by_area(resultados_estudiantes, 'total', 235, 315, 415)
+    total = info_by_area(resultados_estudiantes, 'total', 150, 250, 315)
 
     resumen_general = pd.concat([
         lectura_critica,
         matematicas,
         ciencias_naturales,
-        ingles,
         ciencias_sociales,
         total
     ], axis=1)
@@ -56,8 +54,7 @@ def promedios_grupo (resultados_estudiantes):
         "ciencias_naturales",
         "matematicas",
         "ciencias_sociales",
-        "ingles",
-        "comprension_lectora",
+        "lectura_critica",
         "total"
     ]].agg(['mean', 'std', 'min', 'max']).reset_index()
 
