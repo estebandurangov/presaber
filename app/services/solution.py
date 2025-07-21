@@ -2,7 +2,7 @@ import pandas as pd
 from scipy.stats import percentileofscore
 
 def get_solution():
-    return pd.read_csv("templates/solver.csv", encoding="utf-8").iloc[:, :4]
+    return pd.read_csv("templates/solver.csv", encoding="utf-8")
 
 def get_student_a():
     df = pd.read_csv("templates/student1.csv", encoding="utf-8")
@@ -12,7 +12,7 @@ def get_student_b():
     df = pd.read_csv("templates/student2.csv", encoding="utf-8")
     return df.iloc[:, [1]+ list(range(8, df.shape[1]))]
 
-def resultado_estudiante(respuestas_estudiante, respuestas_correctas, area):
+def resultado_estudiante(respuestas_estudiante, respuestas_correctas, area, componente, competencia):
     """
     Calcula el resultado de un estudiante
     """
@@ -23,20 +23,43 @@ def resultado_estudiante(respuestas_estudiante, respuestas_correctas, area):
         'Ciencias sociales': 0,
         'Inglés': 0,
         'Comprension lectora': 0,
+        'Estadística': 0,
+        'Algebra y Cálculo': 0,
+        'Geometría': 0,
+        'Fisica': 0,
+        'Biologia': 0,
+        'Quimica': 0,
+        'Reflexionar a partir de un texto y evaluar su contenido': 0,
+        'Identificar y entender los contenidos locales que conforman un texto': 0,
+        'Comprender cómo se articulan las partes de un texto para darle un sentido global': 0,
+        'Pensamiento Social': 0,
+        'Pensamiento reflexivo y sistémico': 0,
+        'Interpretación y análisis de perspectivas': 0,
+        'Léxico': 0,
+        'Pragmático': 0,
+        'Comunicativo': 0,
+        'Gramatical': 0,
+        'Comprensión lectora': 0,
+        'Lectura inferencial': 0,
+        'Léxico-gramatical': 0,
     }
     for index, respuesta in enumerate(respuestas_estudiante[1:], start=0):
         if respuesta == respuestas_correctas[index]:
             resultado[area[index]] += 1
+            if not pd.isna(componente[index]):
+                resultado[componente[index]] += 1
+            if not pd.isna(competencia[index]):
+                resultado[competencia[index]] += 1
     return resultado
 
-def resultado_estudiantes(respuestas_estudiantes, respuestas_correctas, area):
+def resultado_estudiantes(respuestas_estudiantes, respuestas_correctas, area, componente, competencia):
     """
     Calcula el resultado de varios estudiantes
     """
     resultados = []
     for i in range(respuestas_estudiantes.shape[0]):
         
-        resultado = resultado_estudiante(respuestas_estudiantes.iloc[i], respuestas_correctas, area)
+        resultado = resultado_estudiante(respuestas_estudiantes.iloc[i], respuestas_correctas, area, componente, competencia)
         resultados.append(resultado)
     return resultados
 
@@ -133,52 +156,6 @@ def promedios_grupo (resultados_estudiantes):
 
     return stats_por_grupo.to_dict(orient='records')
 
-def info_by_area(resultados_estudiantes, area: str, lvl_1, lvl_2, lvl_3):
-    df = pd.DataFrame(resultados_estudiantes)
-    resumen_area = df[area].agg(['mean', 'std', 'min', 'max']).reset_index()
-    niveles = {
-        'lvl_1': ((df[area] <= lvl_1)).sum(),
-        'lvl_2': ((df[area] > lvl_1) & (df[area] <= lvl_2)).sum(),
-        'lvl_3': ((df[area] > lvl_2) & (df[area] <= lvl_3)).sum(),
-        'lvl_4': (df[area] > lvl_3).sum()
-    }
-    niveles_df = pd.DataFrame.from_dict(niveles, orient='index', columns=[area]).reset_index()
-    
-
-    resumen_area = pd.concat([
-        resumen_area,
-        niveles_df
-    ])
-    
-
-    return resumen_area
-
-
-def promedio_general(resultados_estudiantes):
-    lectura_critica = info_by_area(resultados_estudiantes, 'comprension_lectora', 35, 50, 65)
-    matematicas = info_by_area(resultados_estudiantes, 'matematicas', 35, 50, 70)
-    ciencias_naturales = info_by_area(resultados_estudiantes, 'ciencias_naturales', 40, 55, 70)
-    ingles = info_by_area(resultados_estudiantes, 'ingles', 36, 57, 70)
-    ciencias_sociales = info_by_area(resultados_estudiantes, 'ciencias_sociales', 40, 55, 70)
-    total = info_by_area(resultados_estudiantes, 'total', 235, 315, 415)
-
-    resumen_general = pd.concat([
-        lectura_critica,
-        matematicas,
-        ciencias_naturales,
-        ingles,
-        ciencias_sociales,
-        total
-    ], axis=1)
-    resumen_general = resumen_general.loc[:, ~resumen_general.columns.duplicated()]
-
-    df_melted = resumen_general.melt(id_vars='index', var_name='area', value_name='valor')
-    df_pivot = df_melted.pivot(index='area', columns='index', values='valor').reset_index()
-    numeric_columns = df_pivot.select_dtypes(include=['number']).columns
-    df_pivot[numeric_columns] = df_pivot[numeric_columns].round(1)
-    
-    return df_pivot.to_dict(orient='records')
-
 def get_all():
     A = get_student_a()
     B = get_student_b()
@@ -193,9 +170,11 @@ def get_all():
 
     respuestas_correctas = solucionario.iloc[:,2]
     area = solucionario.iloc[:,3]
+    componente = solucionario.iloc[:,4]
+    Competencia = solucionario.iloc[:,5]
 
     
-    resultados = resultado_estudiantes(merged, respuestas_correctas, area)
+    resultados = resultado_estudiantes(merged, respuestas_correctas, area, componente, Competencia)
     
     
     res = pd.DataFrame(resultados)
@@ -204,8 +183,22 @@ def get_all():
 
     count_questions = 100 / count_questions
 
+    componentes_value = componente.value_counts()
+    componentes_value = 100 / componentes_value
+
+    competencias_value = Competencia.value_counts()
+    competencias_value = 100 / competencias_value
+
     for area_name in ['Ciencias Naturales', 'Matemáticas', 'Ciencias sociales', 'Inglés', 'Comprension lectora']:
         res[area_name] = res[area_name] * count_questions[area_name]
+
+    for componente_name in componentes_value.index:
+        if componente_name in res.columns:
+            res[componente_name] = res[componente_name] * componentes_value[componente_name]
+
+    for competencia_name in competencias_value.index:
+        if competencia_name in res.columns:
+            res[competencia_name] = res[competencia_name] * competencias_value[competencia_name]
     
     res['total'] = (
         res['Inglés'] * 1 +
@@ -216,7 +209,16 @@ def get_all():
     ) / 13
 
     res['total'] = (res['total'] * 5).round()
-    res.columns = ['codigo', 'ciencias_naturales', 'matematicas', 'ciencias_sociales', 'ingles', 'comprension_lectora', 'total']
+    res.columns = [
+        'codigo', 'ciencias_naturales', 'matematicas', 'ciencias_sociales', 'ingles', 'lectura_critica', 
+        'estadistica', 'algebra','geometria', 
+        'fisica', 'biologia', 'quimica ',
+        'evaluar_texto', 'entender_contenidos', 'articular_partes',
+        'pensamiento_social', 'pensamiento_reflexivo', 'interpretacion_perspectivas',
+        'lexico', 'pragmatico', 'comunicativo', 'gramatical',
+        'comprension_lectora', 'lectura_inferencial', 'lexico_gramatical',
+        'total',        
+        ]
     res = res.astype(int)
     
     # Verificar si existen códigos repetidos en 'res'
