@@ -57,9 +57,11 @@ def promedios_instituciones (resultados_estudiantes):
         "matematicas",
         "ciencias_sociales",
         "ingles",
-        "comprension_lectora",
+        "lectura_critica",
         "total"
     ]].agg(['mean', 'std', 'min', 'max']).reset_index()
+
+    stats_por_institucion.fillna(0, inplace=True)
 
     stats_por_institucion.iloc[:, 1:] = stats_por_institucion.iloc[:, 1:].round(0).astype(int)
 
