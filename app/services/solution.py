@@ -192,7 +192,7 @@ def get_all():
     if not duplicated_codes.empty:
         print("Códigos repetidos encontrados:")
         for _, row in duplicated_codes.iterrows():
-            print(f"Código: {row['codigo']}, Municipio: {row.get('Municipio', 'N/A')}")
+            print(f"Código: {row['codigo']}, Institucion: {row.get('Institucion', 'N/A')}")
     
     final_df.to_csv("templates/final_results.csv", index=False, encoding="utf-8")
     return final_df
