@@ -22,7 +22,7 @@ def resultado_estudiante(respuestas_estudiante, respuestas_correctas, area, comp
         'Matemáticas': 0,
         'Ciencias sociales': 0,
         'Inglés': 0,
-        'Comprension lectora': 0,
+        'Lectura Critica': 0,
         'Estadística': 0,
         'Algebra y Cálculo': 0,
         'Geometría': 0,
@@ -142,7 +142,7 @@ def get_all():
     competencias_value = Competencia.value_counts()
     competencias_value = 100 / competencias_value
 
-    for area_name in ['Ciencias Naturales', 'Matemáticas', 'Ciencias sociales', 'Inglés', 'Comprension lectora']:
+    for area_name in ['Ciencias Naturales', 'Matemáticas', 'Ciencias sociales', 'Inglés', 'Lectura Critica']:
         res[area_name] = res[area_name] * count_questions[area_name]
 
     for componente_name in componentes_value.index:
@@ -155,7 +155,7 @@ def get_all():
     
     res['total'] = (
         res['Inglés'] * 1 +
-        res['Comprension lectora'] * 3 +
+        res['Lectura Critica'] * 3 +
         res['Matemáticas'] * 3 +
         res['Ciencias sociales'] * 3 +
         res['Ciencias Naturales'] * 3
