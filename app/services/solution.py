@@ -28,6 +28,9 @@ def resultado_estudiante(respuestas_estudiante, respuestas_correctas, area, comp
         'Entorno vivo': 0,
         'CTS': 0,
         'Entorno físico': 0,
+        'Uso del conocimiento científico': 0,
+        'Indagación': 0,
+        'Explicación de fenómenos': 0,
         'Multiperspectivismo': 0,
         'Pensamiento sistémico': 0,
         'Conocimiento': 0,
@@ -160,7 +163,7 @@ def get_all():
     res.columns = [
         'codigo', 'ciencias_naturales', 'matematicas', 'ciencias_sociales', 'lectura_critica', 
         'aleatorio', 'numerico_variacional', 'espacial_metricos', 'entorno_vivo',
-        'cts', 'entorno_fisico', 'multiperspectivismo', 'pensamiento_sistemico',
+        'cts', 'entorno_fisico', 'conocimiento_cientifico', 'indagacion', 'fenomenos','multiperspectivismo', 'pensamiento_sistemico',
         'conocimiento', 'planteamiento_y_resolucion_de_problemas',
         'comunicacion_modelacion_y_representacion', 'razonamiento_y_argumentacion',
         'comprende_sentido_del_texto', 'asume_posicion_critica', 'recupera_informacion_literal',

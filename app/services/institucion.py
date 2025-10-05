@@ -77,4 +77,4 @@ def get_all_means(resultados_estudiantes):
     return(medias)
 
 
-get_all_means(get_solution())
+#get_all_means(get_solution())
