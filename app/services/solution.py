@@ -6,11 +6,11 @@ def get_solution():
 
 def get_student_a():
     df = pd.read_csv("templates/student1.csv", encoding="utf-8")
-    return df.iloc[:, [1]+ list(range(8, df.shape[1]))]
+    return df.iloc[:, [1]+ list(range(7, df.shape[1]))]
 
 def get_student_b():
     df = pd.read_csv("templates/student2.csv", encoding="utf-8")
-    return df.iloc[:, [1]+ list(range(8, df.shape[1]))]
+    return df.iloc[:, [1]+ list(range(7, df.shape[1]))]
 
 def resultado_estudiante(respuestas_estudiante, respuestas_correctas, area, componente, competencia):
     """
@@ -23,25 +23,51 @@ def resultado_estudiante(respuestas_estudiante, respuestas_correctas, area, comp
         'Ciencias sociales': 0,
         'Inglés': 0,
         'Lectura Critica': 0,
-        'Estadística': 0,
-        'Algebra y Cálculo': 0,
-        'Geometría': 0,
-        'Fisica': 0,
-        'Biologia': 0,
-        'Quimica': 0,
-        'Reflexionar a partir de un texto y evaluar su contenido': 0,
-        'Identificar y entender los contenidos locales que conforman un texto': 0,
-        'Comprender cómo se articulan las partes de un texto para darle un sentido global': 0,
-        'Pensamiento Social': 0,
-        'Pensamiento reflexivo y sistémico': 0,
-        'Interpretación y análisis de perspectivas': 0,
-        'Léxico': 0,
-        'Pragmático': 0,
-        'Comunicativo': 0,
-        'Gramatical': 0,
-        'Comprensión lectora': 0,
-        'Lectura inferencial': 0,
-        'Léxico-gramatical': 0,
+        #Competencias ciencias naturales
+        'Uso comprensivo del conocimiento científico': 0,
+        'Indagación ': 0,
+        'Explicación de fenómenos': 0,
+
+        #componentes ciencias naturales
+        'Componente biológico':0,
+        'CTS':0,
+        'Componente químico':0,
+        'Componente físico':0,
+
+        #competencias Matematicas
+        'Argumentación':0,
+        'Interpretación y representación':0,
+        'Formulación y ejecución':0,
+
+        #componentes matematicas
+        'Algebra y Calculo':0,
+        'Geometría':0,
+        'Estadística':0,
+
+        #competencias Ciencias Sociales
+        'Interpretación y análisis de perspectivas':0,
+        'Pensamiento Social':0,
+        'Pensamiento reflexivo y sistémico':0,
+
+        #competencias Ingles
+        'Evalua el conocimiento lexical':0,
+        'Indaga por el conocimiento pragmático':0,
+        'Evalúa el conocimiento comunicativo':0,
+        'Con base en un texto evalúa el conocimiento gramatical':0,
+        'Evalúa la comprensión de lectura literal de un texto':0,
+        'Evalúa el proceso de lectura inferencial':0,
+        'Con base en un texto evalúa el conocimiento gramatical y lexical':0,
+
+        #competencias Lectura
+        'Comprender cómo se articulan las partes de un texto para darle un sentido global':0,
+        'Identificar y entender los contenidos locales que conforman un texto':0,
+        'Reflexionar a partir de un texto y evaluar su contenido':0,
+
+        #componentes lectura
+        'Texto continuo literario ':0,
+        'Texto continuo informativo no filosófico':0,
+        'Texto discontinuo literario':0,
+        'Texto discontinuo informativo':0,
     }
     for index, respuesta in enumerate(respuestas_estudiante[1:], start=0):
         if respuesta == respuestas_correctas[index]:
@@ -86,7 +112,7 @@ def calcular_puestos(df: pd.DataFrame) -> pd.DataFrame:
     orden = [
         "total",
         "matematicas",
-        "comprension_lectora",
+        "lectura_critica",
         "ciencias_naturales",
         "ciencias_sociales",
         "ingles",
@@ -163,13 +189,59 @@ def get_all():
 
     res['total'] = (res['total'] * 5).round()
     res.columns = [
-        'codigo', 'ciencias_naturales', 'matematicas', 'ciencias_sociales', 'ingles', 'lectura_critica', 
-        'estadistica', 'algebra','geometria', 
-        'fisica', 'biologia', 'quimica ',
-        'evaluar_texto', 'entender_contenidos', 'articular_partes',
-        'pensamiento_social', 'pensamiento_reflexivo', 'interpretacion_perspectivas',
-        'lexico', 'pragmatico', 'comunicativo', 'gramatical',
-        'comprension_lectora', 'lectura_inferencial', 'lexico_gramatical',
+        'codigo', 
+        'ciencias_naturales', 
+        'matematicas', 
+        'ciencias_sociales', 
+        'ingles', 
+        'lectura_critica', 
+
+        #Competencias ciencias naturales
+        'conocimiento_cientifico',
+        'Indagacion',
+        'Explicacion_de_fenomenos',
+
+        #componentes ciencias naturales
+        'Componente_biologico',
+        'CTS',
+        'Componente_quimico',
+        'Componente_fisico',
+
+        #competencias Matematicas
+        'Argumentacion',
+        'Interpretacion_y_representacion',
+        'Formulacion_y_ejecucion',
+
+        #componentes matematicas
+        'Algebra_y_Calculo',
+        'Geometria',
+        'Estadistica',
+
+        #competencias Ciencias Sociales
+        'Interpretacion_y_analisis_de_perspectivas',
+        'Pensamiento_Social',
+        'Pensamiento_reflexivo_y_sistemico',
+
+        #competencias Ingles
+        'Evalua_el_conocimiento_lexical',
+        'Indaga_por_el_conocimiento_pragmatico',
+        'Evalua_el_conocimiento_comunicativo',
+        'Con_base_en_un_texto_evalua_el_conocimiento_gramatical',
+        'Evalua_la_comprension_de_lectura_literal_de_un_texto',
+        'Evalua_el_proceso_de_lectura_inferencial',
+        'Con_base_en_un_texto_evalua_el_conocimiento_gramatical_y_lexical',
+
+        #competencias Lectura
+        'Comprender_como_se_articulan_las_partes_de_un_texto_para_darle_un_sentido_global',
+        'Identificar_y_entender_los_contenidos_locales_que_conforman_un_texto',
+        'Reflexionar_a_partir_de_un_texto_y_evaluar_su_contenido',
+
+        #componentes lectura
+        'Texto_continuo_literario',
+        'Texto_continuo_informativo_no_filosofico',
+        'Texto_discontinuo_literario',
+        'Texto_discontinuo_informativo',
+
         'total',        
         ]
     res = res.astype(int)
