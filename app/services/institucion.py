@@ -57,7 +57,7 @@ def promedios_grupo (resultados_estudiantes):
         "matematicas",
         "ciencias_sociales",
         "ingles",
-        "comprension_lectora",
+        "lectura_critica",
         "total"
     ]].agg(['mean', 'std', 'min', 'max']).reset_index()
 
@@ -80,4 +80,4 @@ def get_all_means(resultados_estudiantes):
     return(medias)
 
 
-get_all_means(get_solution())
+#get_all_means(get_solution())
