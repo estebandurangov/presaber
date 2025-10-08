@@ -6,11 +6,11 @@ def get_solution():
 
 def get_student_a():
     df = pd.read_csv("templates/student1.csv", encoding="utf-8")
-    return df.iloc[:, [1]+ list(range(8, df.shape[1]))]
+    return df.iloc[:, [1]+ list(range(7, df.shape[1]))]
 
 def get_student_b():
     df = pd.read_csv("templates/student2.csv", encoding="utf-8")
-    return df.iloc[:, [1]+ list(range(8, df.shape[1]))]
+    return df.iloc[:, [1]+ list(range(7, df.shape[1]))]
 
 def resultado_estudiante(respuestas_estudiante, respuestas_correctas, area, componente, competencia):
     """
@@ -29,9 +29,9 @@ def resultado_estudiante(respuestas_estudiante, respuestas_correctas, area, comp
         'Explicación de fenómenos': 0,
 
         #componentes ciencias naturales
-        'Componente biológico':0,
-        'Componente químico':0,
-        'Componente físico':0,
+        'Biologia':0,
+        'Quimica':0,
+        'Fisica':0,
 
         #competencias Matematicas
         'Argumentación':0,
@@ -39,7 +39,7 @@ def resultado_estudiante(respuestas_estudiante, respuestas_correctas, area, comp
         'Inferencia': 0,
 
         #componentes matematicas
-        'Algebra y Calculo':0,
+        'Algebra y Cálculo':0,
         'Geometría':0,
         'Estadística':0,
         'Aritmética':0,
@@ -50,12 +50,13 @@ def resultado_estudiante(respuestas_estudiante, respuestas_correctas, area, comp
         'Pensamiento reflexivo y sistémico':0,
 
         #competencias Ingles
-        "Evalúa el conocimiento lexical":0,
-        "Indaga por el conocimiento pragmático":0,
-        "Con base en un texto evalúa el conocimiento gramatical":0,
-        "Evalúa el conocimiento comunicativo":0,
-        "Evalúa la comprensión de lectura literal de un texto":0,
-        "Evalúa el proceso de lectura inferencial":0,
+        "Léxico":0,
+        "Pragmático":0,
+        "Comunicativo":0,
+        "Gramatical":0,
+        "Comprensión de lectura literal":0,
+        "Lectura inferencial":0,
+        "Léxico-gramatical":0,
 
         #competencias Lectura
         'Comprender cómo se articulan las partes de un texto para darle un sentido global':0,
@@ -196,9 +197,9 @@ def get_all():
         'Explicacion_de_fenomenos',
 
         #componentes ciencias naturales
-        'Componente_biologico',
-        'Componente_quimico',
-        'Componente_fisico',
+        'Biologia',
+        'Quimica',
+        'Fisica',
 
         #competencias Matematicas
         'Argumentacion',
@@ -219,10 +220,12 @@ def get_all():
         #componentes Ingles
         "evalua_el_conocimiento_lexical",
         "indaga_por_el_conocimiento_pragmatico",
-        "con_base_en_un_texto_evalua_el_conocimiento_gramatical",
         "evalua_el_conocimiento_comunicativo",
+        "con_base_en_un_texto_evalua_el_conocimiento_gramatical",
         "evalua_la_comprension_de_lectura_literal_de_un_texto",
         "evalua_el_proceso_de_lectura_inferencial",
+        "lexico-gramatical",
+
 
         #competencias Lectura
         'Comprender_como_se_articulan_las_partes_de_un_texto_para_darle_un_sentido_global',
@@ -236,7 +239,7 @@ def get_all():
     # Verificar si existen códigos repetidos en 'res'
     
     codes_with_name = pd.read_csv("templates/codes.csv", encoding="utf-8")
-    codes_with_name['Grupo'] = codes_with_name['Grupo'].fillna(0).astype(int).astype(str)
+    #codes_with_name['Grupo'] = codes_with_name['Grupo'].fillna(0).astype(int).astype(str)
     #codes_with_name['Documento'] = codes_with_name['Documento'].fillna(0).astype(int).astype(str)
 
     #codes_with_name = codes_with_name.drop(columns=['Firma'])
