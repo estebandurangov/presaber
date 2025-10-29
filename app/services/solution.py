@@ -6,11 +6,11 @@ def get_solution():
 
 def get_student_a():
     df = pd.read_csv("templates/student1.csv", encoding="utf-8")
-    return df.iloc[:, [1]+ list(range(8, df.shape[1]))]
+    return df.iloc[:, [1]+ list(range(7, df.shape[1]))]
 
 def get_student_b():
     df = pd.read_csv("templates/student2.csv", encoding="utf-8")
-    return df.iloc[:, [1]+ list(range(8, df.shape[1]))]
+    return df.iloc[:, [1]+ list(range(7, df.shape[1]))]
 
 def resultado_estudiante(respuestas_estudiante, respuestas_correctas, area, componente, competencia):
     """
@@ -22,24 +22,32 @@ def resultado_estudiante(respuestas_estudiante, respuestas_correctas, area, comp
         'Matemáticas': 0,
         'Ciencias sociales': 0,
         'Inglés': 0,
-        'Comprension lectora': 0,
+        'Lectura Critica': 0,
+        #COMPONENTES MATEMATICAS
         'Estadística': 0,
         'Algebra y Cálculo': 0,
         'Geometría': 0,
+        #COMPONENTES CIENCIAS NATURALES
         'Fisica': 0,
         'Biologia': 0,
         'Quimica': 0,
+        
+        #COMPETENCIAS LECTURA CRITICA
         'Reflexionar a partir de un texto y evaluar su contenido': 0,
         'Identificar y entender los contenidos locales que conforman un texto': 0,
         'Comprender cómo se articulan las partes de un texto para darle un sentido global': 0,
+        
+        #COMPETENCIAS CIENCIAS SOCIALES
         'Pensamiento Social': 0,
         'Pensamiento reflexivo y sistémico': 0,
         'Interpretación y análisis de perspectivas': 0,
+        
+        #COMPETENCIAS INGLES
         'Léxico': 0,
         'Pragmático': 0,
         'Comunicativo': 0,
         'Gramatical': 0,
-        'Comprensión lectora': 0,
+        'Comprensión de lectura literal': 0,
         'Lectura inferencial': 0,
         'Léxico-gramatical': 0,
     }
@@ -86,7 +94,7 @@ def calcular_percentiles_por_municipio(df: pd.DataFrame) -> pd.DataFrame:
 def calcular_puestos(df: pd.DataFrame) -> pd.DataFrame:
     # Ordenamos por los criterios especificados
     df_ordenado = df.sort_values(
-        by=["total", "matematicas", "comprension_lectora", "ciencias_naturales", "ciencias_sociales", "ingles"],
+        by=["total", "matematicas", "lectura_critica", "ciencias_naturales", "ciencias_sociales", "ingles"],
         ascending=[False] * 6
     ).reset_index(drop=True)
 
@@ -114,7 +122,7 @@ def calcular_puestos_por_municipio(df: pd.DataFrame) -> pd.DataFrame:
     orden = [
         "total",
         "matematicas",
-        "comprension_lectora",
+        "lectura_critica",
         "ciencias_naturales",
         "ciencias_sociales",
         "ingles",
@@ -142,7 +150,7 @@ def promedios_grupo (resultados_estudiantes):
         "matematicas",
         "ciencias_sociales",
         "ingles",
-        "comprension_lectora",
+        "lectura_critica",
         "total"
     ]].agg(['mean', 'std', 'min', 'max']).reset_index()
 
@@ -189,7 +197,7 @@ def get_all():
     competencias_value = Competencia.value_counts()
     competencias_value = 100 / competencias_value
 
-    for area_name in ['Ciencias Naturales', 'Matemáticas', 'Ciencias sociales', 'Inglés', 'Comprension lectora']:
+    for area_name in ['Ciencias Naturales', 'Matemáticas', 'Ciencias sociales', 'Inglés', 'Lectura Critica']:
         res[area_name] = res[area_name] * count_questions[area_name]
 
     for componente_name in componentes_value.index:
@@ -202,7 +210,7 @@ def get_all():
     
     res['total'] = (
         res['Inglés'] * 1 +
-        res['Comprension lectora'] * 3 +
+        res['Lectura Critica'] * 3 +
         res['Matemáticas'] * 3 +
         res['Ciencias sociales'] * 3 +
         res['Ciencias Naturales'] * 3

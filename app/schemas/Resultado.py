@@ -10,7 +10,7 @@ class Resultado(BaseModel):
     matematicas: int
     ciencias_sociales: int
     ingles: int
-    comprension_lectora: int
+    lectura_critica: int
     total: int
     percentil: int
     puesto: int

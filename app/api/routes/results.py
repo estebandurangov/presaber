@@ -13,6 +13,7 @@ async def get_results(municipio: str = None):
     if municipio:
         df = get_all()
         df_filtrado = df[df["Municipio"] == municipio]
+        df_filtrado = df_filtrado.sort_values(by="codigo")
         return df_filtrado.to_dict(orient='records')
     return get_all().to_dict(orient='records')
 
