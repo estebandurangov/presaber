@@ -5,11 +5,34 @@ class Resultado(BaseModel):
     Institucion: str
     Grupo: str
     codigo: int
-    ciencias_naturales: int 
-    matematicas: int
-    ciencias_sociales: int
-    ingles: int
-    lectura_critica: int
-    total: int
-    percentil: int
-    puesto: int
+    FISICA: int 
+    LECTURA_CRÍTICA: int
+    QUÍMICA: int
+    CIENCIAS_SOCIALES: int
+    MATEMÁTICAS: int
+    BIOLOGÍA: int
+    causa_fenomeno_transitos: int
+    proporcionalidad_tamano_planeta: int
+    curva_luz_fenomeno: int
+    tecnica_velocidades_radiales: int
+    prediccion_curva_luz: int
+    funcion_retórica_parrafo: int
+    funcion_elemento_gramatical: int
+    intencion_autor_divulgacion: int
+    avance_tecnologico_filosofia: int
+    escala_cosmica_existencia: int
+    operaciones_notacion_cientifica: int
+    razon_proporcion_porcentual: int
+    porcentaje_valor_especifico: int
+    linea_base_concordancia_azar: int
+    intencion_critica_autor: int
+    herencia_genes_ancestro: int
+    similitud_genetica_evolucion: int
+    componentes_quimicos_adn: int
+    estructura_adn_puentes_hidrogeno: int
+    simplificacion_conocimiento_publico: int
+    analogias_conceptos_cientificos: int
+    identidad_humana_genomica: int
+    porcentaje_diferencia_pares_bases: int
+    probabilidad_evento_complementario: int
+    principio_multiplicacion_combinatoria: int
